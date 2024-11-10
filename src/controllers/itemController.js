@@ -2,6 +2,44 @@ import { saveItem, getAllItems } from '../services/dynamoService.js';
 import ItemModel from '../models/itemModel.js';
 import { formatResponse, errorResponse } from '../utils/response.js';
 
+/**
+ * @swagger
+ * /api/items:
+ *   post:
+ *     summary: Crear un nuevo elemento
+ *     description: Crea un nuevo item de Star Wars y lo guarda en DynamoDB.
+ *     parameters:
+ *       - name: item
+ *         in: body
+ *         description: El item que se va a crear.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *             name:
+ *               type: string
+ *             height:
+ *               type: string
+ *             mass:
+ *               type: string
+ *             hair_color:
+ *               type: string
+ *             skin_color:
+ *               type: string
+ *             eye_color:
+ *               type: string
+ *             birth_year:
+ *               type: string
+ *             gender:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Item creado con éxito
+ *       500:
+ *         description: Error al crear el item
+ */
 export const createItem = async (event) => {
   try {
     const data = JSON.parse(event.body);
@@ -26,6 +64,18 @@ export const createItem = async (event) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/items:
+ *   get:
+ *     summary: Obtener todos los elementos
+ *     description: Obtiene una lista de todos los items almacenados en DynamoDB.
+ *     responses:
+ *       200:
+ *         description: Lista de items obtenida con éxito
+ *       500:
+ *         description: Error al obtener los items
+ */
 export const getItems = async () => {
   try {
     const items = await getAllItems();

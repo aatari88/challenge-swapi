@@ -35,17 +35,23 @@ plugins:
 #       - httpApi: "*"
 
 functions:
+  api:
+    handler: app.main
+    events:
+      - http:
+          path: api-docs     # Ruta de Swagger
+          method: get         # Permitir GET para la documentación de Swagger
   createItem:
     handler: src/handler.createItemHandler
     events:
       - http:
-          path: item
+          path: api/item
           method: post
   getItems:
     handler: src/handler.getItemsHandler
     events:
       - http:
-          path: items
+          path: api/items
           method: get
   obtenerPersonaje:
     handler: src/handler.obtenerPersonajeHandler
@@ -59,7 +65,6 @@ functions:
       - http:
           path: api/personajes
           method: get
-
 resources:
   Resources:
     UsersTable:
