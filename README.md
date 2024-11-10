@@ -1,90 +1,45 @@
-<!--
-title: 'Serverless Framework Node Express API service backed by DynamoDB on AWS'
-description: 'This template demonstrates how to develop and deploy a simple Node Express API service backed by DynamoDB running on AWS Lambda using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-priority: 1
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Star Wars API con DynamoDB y Swagger
 
-# Serverless Framework Node Express API on AWS
+Esta es una API que interactúa con datos de Star Wars almacenados en DynamoDB. La aplicación utiliza Serverless Framework y Swagger para documentar y exponer la API localmente. Esta guía te guiará a través del proceso de instalación y ejecución.
 
-This template demonstrates how to develop and deploy a simple Node Express API service, backed by DynamoDB table, running on AWS Lambda using the Serverless Framework.
+## Requisitos previos
 
-This template configures a single function, `api`, which is responsible for handling all incoming requests using the `httpApi` event. To learn more about `httpApi` event configuration options, please refer to [httpApi event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). As the event is configured in a way to accept all incoming requests, the Express.js framework is responsible for routing and handling requests internally. This implementation uses the `serverless-http` package to transform the incoming event request payloads to payloads compatible with Express.js. To learn more about `serverless-http`, please refer to the [serverless-http README](https://github.com/dougmoscrop/serverless-http).
+Antes de empezar, asegúrate de tener instalados los siguientes programas:
 
-Additionally, it also handles provisioning of a DynamoDB database that is used for storing data about users. The Express.js application exposes two endpoints, `POST /users` and `GET /user/:userId`, which create and retrieve a user record.
+- [Node.js](https://nodejs.org/) (version 18 o superior)
+- [npm](https://www.npmjs.com/) o [Yarn](https://yarnpkg.com/) como gestor de dependencias
+- [Serverless Framework](https://www.serverless.com/) - Instálalo globalmente con el siguiente comando:
+  ```bash
+  npm install -g serverless
 
-## Usage
+### Clona el repositorio
+git clone https://github.com/aatari88/challenge-swapi
+cd challenge-swapi
 
-### Deployment
-
-Install dependencies with:
-
-```
+### Instala las dependencias del proyecto:
 npm install
-```
 
-and then deploy with:
+### Correr dynamoDb en local
+java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb -port 8000.
 
-```
-serverless deploy
-```
+### Crear tabla itemTable
+aws dynamodb create-table     --table-name itemTable     --attribute-definitions AttributeName=id,AttributeType=S     --key-schema AttributeName=id,KeyType=HASH     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5     --endpoint-url http://localhost:8000
 
-After running deploy, you should see output similar to:
+### Correr servidro en local
+sls offline start
 
-```
-Deploying "aws-node-express-dynamodb-api" to stage "dev" (us-east-1)
+## Swagger
+Corre: node app.js
 
-✔ Service deployed to stack aws-node-express-dynamodb-api-dev (109s)
+Swagger está habilitado para la documentación de la API. Puedes acceder a la documentación interactiva en la siguiente URL:
+http://localhost:3000/dev/api-docs
 
-endpoint: ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com
-functions:
-  api: aws-node-express-dynamodb-api-dev-api (3.8 MB)
-```
+## Despliegue en AWS
+Para desplegar la aplicación en AWS usando Serverless Framework, primero configura tus credenciales de AWS y luego ejecuta el siguiente comando:
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [`httpApi` event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). Additionally, in current configuration, the DynamoDB table will be removed when running `serverless remove`. To retain the DynamoDB table even after removal of the stack, add `DeletionPolicy: Retain` to its resource definition.
+sls deploy
 
-### Invocation
+## Pruebas unitarias
+Las pruebas unitarias se han configurado utilizando Jest. Para ejecutarlas, simplemente ejecuta el siguiente comando:
 
-After successful deployment, you can create a new user by calling the corresponding endpoint:
-
-```
-curl --request POST 'https://xxxxxx.execute-api.us-east-1.amazonaws.com/users' --header 'Content-Type: application/json' --data-raw '{"name": "John", "userId": "someUserId"}'
-```
-
-Which should result in the following response:
-
-```json
-{ "userId": "someUserId", "name": "John" }
-```
-
-You can later retrieve the user by `userId` by calling the following endpoint:
-
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/users/someUserId
-```
-
-Which should result in the following response:
-
-```json
-{ "userId": "someUserId", "name": "John" }
-```
-
-### Local development
-
-The easiest way to develop and test your function is to use the `dev` command:
-
-```
-serverless dev
-```
-
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
-
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
-
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+npm test
