@@ -1,6 +1,4 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
-org: huarango
-# "service" is the name of this project. This will also be added to your AWS resource names.
+
 service: challenge-swapi
 
 stages:
@@ -27,11 +25,40 @@ provider:
   environment:
     USERS_TABLE: ${param:tableName}
 
+plugins:
+  - serverless-offline  # Agrega el plugin aquí
+
+# functions:
+#   api:
+#     handler: src/handler.handler
+#     events:
+#       - httpApi: "*"
+
 functions:
-  api:
-    handler: src/handler.handler
+  createItem:
+    handler: src/handler.createItemHandler
     events:
-      - httpApi: "*"
+      - http:
+          path: item
+          method: post
+  getItems:
+    handler: src/handler.getItemsHandler
+    events:
+      - http:
+          path: items
+          method: get
+  obtenerPersonaje:
+    handler: src/handler.obtenerPersonajeHandler
+    events:
+      - http:
+          path: api/personajes/{id}
+          method: get
+  buscarPersonajes:
+    handler: src/handler.buscarPersonajesHandler
+    events:
+      - http:
+          path: api/personajes
+          method: get
 
 resources:
   Resources:
